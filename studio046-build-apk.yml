@@ -1,0 +1,31 @@
+name: Gerar APK Studio 046
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preparar projeto
+        run: unzip -q studio046-source.zip -d source
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Compilar APK
+        working-directory: source
+        run: gradle assembleRelease
+      - name: Preparar download
+        run: cp source/app/build/outputs/apk/release/app-release.apk Studio-046.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Studio-046-APK
+          path: Studio-046.apk
+          retention-days: 30
